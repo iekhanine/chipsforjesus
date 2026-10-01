@@ -134,7 +134,7 @@ function HomePage() {
         <article className="offer-card featured">
           <div className="offer-icon"><Sparkles size={24} /></div>
           <p className="eyebrow">OPTION ONE</p>
-          <h2>Buy a Prayer Chip</h2>
+          <h2>Prayer for You</h2>
           <p className="offer-copy">
             You buy a chip. You can tell me what is going on, or leave it blank. I will take the request seriously and say a prayer for you.
           </p>
@@ -159,18 +159,18 @@ function HomePage() {
         <article className="offer-card dark-card">
           <div className="offer-icon"><HeartHandshake size={24} /></div>
           <p className="eyebrow">OPTION TWO</p>
-          <h2>Pray for Ivan</h2>
+          <h2>Prayer for Me</h2>
           <p className="offer-copy">
-            Think I need more help than you do? Fair. Spend a dollar and put the prayer back on me.
+            Think I need more help than you do? Fair. Put the prayer back on me.
           </p>
 
           <blockquote>
-            “Maybe enough of you will eventually get through to somebody.”
+            “You pray for me. I’ll take all the help I can get.”
           </blockquote>
 
           <QuantityControl value={prayQty} onChange={setPrayQty} label="prayers" dark />
           <button className="secondary-button" disabled={loading !== null} onClick={() => checkout('pray')}>
-            {loading === 'pray' ? 'Opening Stripe...' : `Pray for Ivan ${prayQty}× for $${prayQty}`}
+            {loading === 'pray' ? 'Opening Stripe...' : `Pray for Me ${prayQty}× for $${prayQty}`}
             <ArrowRight size={17} />
           </button>
         </article>
@@ -222,12 +222,12 @@ function HowItWorksPage() {
         <p className="eyebrow">HOW THIS WORKS</p>
         <h1>One dollar.<br /><em>One very small act of faith.</em></h1>
         <p>
-          The site is intentionally ridiculous. The prayer requests are not. Here is exactly what happens when you buy a chip or decide Ivan needs the prayer more than you do.
+          The site is intentionally ridiculous. The prayer requests are not. Here is exactly what happens when you buy a chip or decide I need the prayer more than you do.
         </p>
       </section>
 
       <section className="steps page-steps">
-        <div><span>01</span><h3>Pick a side</h3><p>Buy a prayer chip for yourself or someone else, or spend the dollar praying for Ivan.</p></div>
+        <div><span>01</span><h3>Pick a side</h3><p>Buy a prayer chip for yourself or someone else, or spend the dollar praying for me.</p></div>
         <div><span>02</span><h3>Pay one dollar</h3><p>Checkout is handled securely by Stripe. You can buy more than one chip if you are feeling ambitious.</p></div>
         <div><span>03</span><h3>The prayer happens</h3><p>If you submit a prayer request, Ivan reads it and takes a sincere moment to pray for what you asked about.</p></div>
       </section>
@@ -242,9 +242,9 @@ function HowItWorksPage() {
 
       <section className="content-card dark-content-card">
         <p className="eyebrow">THE OTHER DIRECTION</p>
-        <h2>What does “Pray for Ivan” mean?</h2>
+        <h2>What does “Pray for Me” mean?</h2>
         <p>
-          It means exactly what it sounds like. You spend a dollar, and the prayer is yours to make for Ivan. There is no claim that buying a prayer makes it stronger, faster, or more likely to receive divine technical support.
+          It means exactly what it sounds like. You spend a dollar, and the prayer is yours to make for me. There is no claim that buying a prayer makes it stronger, faster, or more likely to receive divine technical support.
         </p>
       </section>
     </main>
@@ -266,7 +266,7 @@ function FinePrintPage() {
       <section className="legal-grid">
         <article className="legal-card">
           <h2>Who operates this?</h2>
-          <p>Chips for Jesus is an independent novelty project operated by Ivan Khanine.</p>
+          <p>Chips for Jesus is an independent novelty project operated by Ivan.</p>
         </article>
         <article className="legal-card">
           <h2>Is this a charity?</h2>

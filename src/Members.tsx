@@ -142,12 +142,7 @@ export default function Members() {
         <div className="admin-heading-actions">
           <span>{profile?.name || session.user.user_metadata?.full_name || session.user.email}<br />{profile?.email || session.user.email}</span>
           <button onClick={() => loadAccount()} disabled={loading}><RefreshCcw size={15} /> Refresh</button>
-          <button
-  onClick={async () => {
-    await supabase?.auth.signOut()
-    window.location.assign('/login')
-  }}
-><LogOut size={15} /> Sign out</button>
+          <button onClick={async () => { await supabase?.auth.signOut(); window.location.assign('/login') }}><LogOut size={15} /> Sign out</button>
         </div>
       </section>
 
@@ -218,7 +213,7 @@ export default function Members() {
             <div>
               <p className="eyebrow">ADMIN ACCESS</p>
               <h2>Jesus Admin</h2>
-              <p>You are signed in as iekhanine@gmail.com, so the full prayer desk is available below.</p>
+              <p>You are signed in as Ivan, so the full prayer desk is available below.</p>
             </div>
             <a href="/jesus-admin"><ShieldCheck size={16} /> Open admin only</a>
           </div>
