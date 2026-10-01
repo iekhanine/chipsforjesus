@@ -6,3 +6,12 @@ dist
 .vercel
 .DS_Store
 *.local
+*.zip
+*.sql
+.vercel
+.env*
+
+.env
+
+.env
+.env.local

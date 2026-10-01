@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { CheckCircle2, Clock3, Coins, LogOut, RefreshCcw, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react'
 import { supabase } from './lib/supabase'
-import JesusAdmin from './JesusAdmin'
 
 type MemberOrder = {
   id: string
@@ -216,9 +215,6 @@ export default function Members() {
               <p>You are signed in as Ivan, so the full prayer desk is available below.</p>
             </div>
             <a href="/jesus-admin"><ShieldCheck size={16} /> Open admin only</a>
-          </div>
-          <div className="member-admin-embedded">
-            <JesusAdmin />
           </div>
         </section>
       )}

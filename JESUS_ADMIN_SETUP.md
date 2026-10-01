@@ -150,3 +150,27 @@ http://localhost:3000/members
 ```
 
 Admin identity: `iekhanine@gmail.com` is always recognized as a Jesus Admin account by the server. `JESUS_ADMIN_EMAILS` may still be used to add additional admin emails.
+
+## 12. Prayer Chip gift emails
+
+When Jesus Admin sends an administrative Prayer Chip grant, the database grant is created first. The server then sends a transactional gift email through Resend.
+
+Required:
+
+```env
+RESEND_API_KEY=re_...
+```
+
+Recommended:
+
+```env
+C4J_SITE_URL=https://chipsforjesus.com
+C4J_FROM_EMAIL=Chips for Jesus <prayer@chipsforjesus.com>
+C4J_REPLY_TO_EMAIL=you@example.com
+```
+
+For compatibility, `RESEND_FROM_EMAIL` or `NOTIFICATION_FROM_EMAIL` can be used instead of `C4J_FROM_EMAIL`.
+
+The sender domain used by `C4J_FROM_EMAIL` must be verified in Resend before it can send to arbitrary recipients. For production, verify `chipsforjesus.com` and use an address on that domain.
+
+Email sending is intentionally non-fatal. If Resend fails, the Prayer Chips stay granted and Jesus Admin reports that the gift succeeded but the email failed.
