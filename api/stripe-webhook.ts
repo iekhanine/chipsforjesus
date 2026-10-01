@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Stripe from 'stripe'
+import { persistCheckoutSession } from './_lib/orders.js'
 
 export const config = {
   api: {
@@ -34,8 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const stripe = new Stripe(secretKey)
-
   const signature = req.headers['stripe-signature']
+
   if (typeof signature !== 'string') {
     return res.status(400).send('Missing Stripe signature')
   }
@@ -46,20 +47,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
-      console.log('Chips for Jesus purchase completed', {
-        sessionId: session.id,
-        kind: session.metadata?.kind,
-        quantity: session.metadata?.quantity,
-        prayerRequest: session.metadata?.prayer_request,
-        customerEmail: session.customer_details?.email,
-      })
-
-      // TODO: Persist counters and prayer requests to a database here.
+      const kind = session.metadata?.kind
+      if (kind === 'chip' || kind === 'pray') {
+        await persistCheckoutSession(session)
+        console.log('Chips for Jesus purchase persisted', {
+          sessionId: session.id,
+          kind,
+          quantity: session.metadata?.quantity,
+          customerEmail: session.customer_details?.email || session.customer_email,
+        })
+      }
     }
 
     return res.status(200).json({ received: true })
   } catch (error) {
     console.error('Stripe webhook error:', error)
-    return res.status(400).send('Invalid webhook')
+    return res.status(400).send(
+      error instanceof Error ? `Invalid webhook: ${error.message}` : 'Invalid webhook',
+    )
   }
 }

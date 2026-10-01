@@ -1,4 +1,8 @@
 import { useMemo, useState } from 'react'
+import JesusAdmin from './JesusAdmin'
+import Members from './Members'
+import { CreateAccountPage, ForgotPasswordPage, LoginPage, ResetPasswordPage } from './AuthPages'
+import { supabase } from './lib/supabase'
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,7 +18,7 @@ import {
 
 type PurchaseKind = 'chip' | 'pray'
 
-type Page = 'home' | 'how' | 'fine-print'
+type Page = 'home' | 'how' | 'fine-print' | 'admin' | 'login' | 'create-account' | 'members' | 'forgot-password' | 'reset-password'
 
 const clamp = (value: number) => Math.max(1, Math.min(50, value))
 
@@ -22,6 +26,12 @@ function currentPage(): Page {
   const path = window.location.pathname.replace(/\/+$/, '') || '/'
   if (path === '/how-it-works') return 'how'
   if (path === '/fine-print') return 'fine-print'
+  if (path === '/jesus-admin') return 'admin'
+  if (path === '/login') return 'login'
+  if (path === '/create-account') return 'create-account'
+  if (path === '/members') return 'members'
+  if (path === '/forgot-password') return 'forgot-password'
+  if (path === '/reset-password') return 'reset-password'
   return 'home'
 }
 
@@ -31,7 +41,15 @@ export default function App() {
   return (
     <div className="site-shell">
       <Header page={page} />
-      {page === 'how' ? <HowItWorksPage /> : page === 'fine-print' ? <FinePrintPage /> : <HomePage />}
+      {page === 'how' ? <HowItWorksPage />
+        : page === 'fine-print' ? <FinePrintPage />
+        : page === 'admin' ? <JesusAdmin />
+        : page === 'login' ? <LoginPage />
+        : page === 'create-account' ? <CreateAccountPage />
+        : page === 'members' ? <Members />
+        : page === 'forgot-password' ? <ForgotPasswordPage />
+        : page === 'reset-password' ? <ResetPasswordPage />
+        : <HomePage />}
       <Footer />
     </div>
   )
@@ -45,8 +63,15 @@ function Header({ page }: { page: Page }) {
         <span>Chips for Jesus</span>
       </a>
       <nav aria-label="Primary navigation">
-        <a className={page === 'how' ? 'active' : ''} href="/how-it-works">How it works</a>
-        <a className={page === 'fine-print' ? 'active' : ''} href="/fine-print">Fine print</a>
+        {page === 'admin' ? (
+          <a href="/">Back to site</a>
+        ) : (
+          <>
+            <a className={page === 'how' ? 'active' : ''} href="/how-it-works">How it works</a>
+            <a className={page === 'fine-print' ? 'active' : ''} href="/fine-print">Fine print</a>
+            <a className={page === 'members' || page === 'login' ? 'active' : ''} href="/members">My chips</a>
+          </>
+        )}
       </nav>
     </header>
   )
@@ -69,9 +94,13 @@ function HomePage() {
     setLoading(kind)
 
     try {
+      const authSession = supabase ? (await supabase.auth.getSession()).data.session : null
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (authSession?.access_token) headers.Authorization = `Bearer ${authSession.access_token}`
+
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           kind,
           quantity: kind === 'chip' ? chipQty : prayQty,
@@ -268,7 +297,7 @@ function Footer() {
   return (
     <footer>
       <span>© {new Date().getFullYear()} Chips for Jesus</span>
-      <span className="footer-links"><a href="/how-it-works">How it works</a><a href="/fine-print">Fine print</a></span>
+      <span className="footer-links"><a href="/how-it-works">How it works</a><a href="/fine-print">Fine print</a><a href="/members">My chips</a></span>
       <span>Built with unreasonable confidence and Stripe.</span>
     </footer>
   )

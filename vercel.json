@@ -1,6 +1,12 @@
 {
   "rewrites": [
     { "source": "/how-it-works", "destination": "/index.html" },
-    { "source": "/fine-print", "destination": "/index.html" }
+    { "source": "/fine-print", "destination": "/index.html" },
+    { "source": "/jesus-admin", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/create-account", "destination": "/index.html" },
+    { "source": "/members", "destination": "/index.html" },
+    { "source": "/forgot-password", "destination": "/index.html" },
+    { "source": "/reset-password", "destination": "/index.html" }
   ]
 }
