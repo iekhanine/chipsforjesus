@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap');
+
+:root {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: #2a2019;
+  background: #f5efe4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink: #2a2019;
+  --cream: #f5efe4;
+  --paper: #fffaf1;
+  --wine: #642f2e;
+  --wine-dark: #3a1c1c;
+  --gold: #b78745;
+  --line: #d7c9b5;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: var(--cream); }
+button, textarea { font: inherit; }
+a { color: inherit; }
+
+.site-shell { min-height: 100vh; }
+.topbar {
+  width: min(1180px, calc(100% - 40px));
+  min-height: 76px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
+.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; color: #fff; background: var(--wine); border-radius: 50%; }
+.topbar nav { display: flex; gap: 24px; }
+.topbar nav a { color: #695b4f; font-size: 13px; font-weight: 700; text-decoration: none; }
+
+main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+.notice { margin-top: 16px; padding: 13px 16px; border: 1px solid var(--line); border-radius: 10px; background: #fff7e9; font-size: 13px; }
+.notice.success { display: flex; gap: 8px; align-items: center; border-color: #a7c8a6; background: #eff8ed; }
+
+.hero { min-height: 570px; display: grid; grid-template-columns: 1.45fr .7fr; gap: 80px; align-items: center; padding: 70px 0 64px; }
+.eyebrow { margin: 0 0 14px; color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+.hero h1, .offer-card h2, .manifesto h2, .fine-print h2 { font-family: 'Libre Caslon Display', Georgia, serif; }
+.hero h1 { max-width: 780px; margin: 0; font-size: clamp(58px, 8vw, 102px); font-weight: 400; line-height: .91; letter-spacing: -.055em; }
+.hero h1 em { color: var(--wine); font-style: italic; }
+.lede { max-width: 680px; margin: 30px 0 22px; color: #685b50; font-size: 18px; line-height: 1.65; }
+.hero-note { display: flex; gap: 9px; align-items: center; color: #796a5c; font-size: 12px; font-weight: 600; }
+.hero-card { padding: 28px; border: 1px solid #4e2c2b; border-radius: 18px; color: #f9eee4; background: var(--wine-dark); box-shadow: 0 24px 55px rgba(58, 28, 28, .12); }
+.hero-card-label { display: block; margin-bottom: 20px; color: #cca977; font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+.status-row { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid rgba(255,255,255,.11); font-size: 13px; }
+.status-row strong { color: #f0c987; }
+.hero-card p { margin: 18px 0 0; color: #bda9a0; font-size: 11px; line-height: 1.55; }
+
+.offers { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; padding-bottom: 70px; }
+.offer-card { min-height: 560px; padding: 38px; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); }
+.offer-card.featured { box-shadow: 0 18px 48px rgba(72, 48, 31, .08); }
+.offer-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 30px; border-radius: 50%; color: var(--wine); background: #efe2d2; }
+.offer-card h2 { margin: 0 0 13px; font-size: 42px; font-weight: 400; letter-spacing: -.035em; }
+.offer-copy { min-height: 78px; margin-bottom: 27px; color: #75675b; font-size: 14px; line-height: 1.65; }
+.field-label { display: flex; justify-content: space-between; margin-bottom: 8px; color: #5e5146; font-size: 12px; font-weight: 800; }
+.field-label span { color: #a08f7d; font-weight: 500; }
+textarea { width: 100%; min-height: 116px; resize: vertical; padding: 14px 15px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: #fffdf8; line-height: 1.5; }
+textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(183,135,69,.12); }
+.field-meta { margin-top: 5px; color: #9b8d7f; font-size: 10px; text-align: right; }
+
+.dark-card { color: #f9efe7; border-color: #3c2423; background: #2c1b1a; }
+.dark-card .offer-icon { color: #f2d3a1; background: #4a2c2a; }
+.dark-card .eyebrow { color: #c8a06a; }
+.dark-card .offer-copy { color: #c2aca3; }
+.dark-card blockquote { margin: 58px 0 84px; padding: 0; border: 0; color: #ecd7c4; font-family: 'Libre Caslon Display', Georgia, serif; font-size: 27px; font-style: italic; line-height: 1.3; }
+
+.quantity { margin-top: 18px; display: grid; grid-template-columns: 1fr auto auto; gap: 17px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.quantity > div:first-child { display: grid; gap: 2px; }
+.quantity span { font-size: 12px; font-weight: 800; }
+.quantity small { color: #9b8c7d; font-size: 10px; }
+.quantity-buttons { display: flex; align-items: center; gap: 13px; }
+.quantity-buttons button { width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 7px; cursor: pointer; color: var(--ink); background: transparent; }
+.quantity-buttons strong { min-width: 18px; text-align: center; }
+.quantity-label { color: #a19384; font-size: 10px !important; text-transform: uppercase; }
+.quantity-dark { border-color: rgba(255,255,255,.15); }
+.quantity-dark small, .quantity-dark .quantity-label { color: #a99087; }
+.quantity-dark .quantity-buttons button { color: #f9eee4; border-color: rgba(255,255,255,.2); }
+
+.primary-button, .secondary-button { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 7px; border: 0; border-radius: 9px; cursor: pointer; font-weight: 800; }
+.primary-button { color: #fff; background: var(--wine); }
+.secondary-button { color: #2f2118; background: #e7bd7d; }
+.primary-button:hover, .secondary-button:hover { transform: translateY(-1px); }
+.primary-button:disabled, .secondary-button:disabled { cursor: wait; opacity: .65; transform: none; }
+.error-box { margin: -45px 0 55px; padding: 13px 16px; border: 1px solid #d88b82; border-radius: 9px; color: #7a2118; background: #fff1ef; font-size: 13px; }
+
+.how { padding: 74px 0 85px; border-top: 1px solid var(--line); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 45px; }
+.steps span { display: block; margin-bottom: 30px; color: var(--gold); font-family: 'Libre Caslon Display', Georgia, serif; font-size: 32px; }
+.steps h3 { margin: 0 0 8px; font-size: 15px; }
+.steps p { margin: 0; color: #75675b; font-size: 13px; line-height: 1.65; }
+
+.manifesto { display: grid; grid-template-columns: auto 1fr; gap: 26px; margin-bottom: 80px; padding: 48px; border-radius: 20px; color: #f7eee7; background: var(--wine); }
+.manifesto h2 { max-width: 850px; margin: 0 0 13px; font-size: 40px; font-weight: 400; }
+.manifesto p:last-child { max-width: 820px; margin: 0; color: #dbc8bd; font-size: 14px; line-height: 1.7; }
+.manifesto .eyebrow { color: #e2bd82; }
+
+.fine-print { padding: 15px 0 70px; }
+.fine-print h2 { margin: 0 0 12px; font-size: 31px; font-weight: 400; }
+.fine-print > p:last-child { max-width: 900px; margin: 0; color: #796b60; font-size: 12px; line-height: 1.7; }
+footer { width: min(1180px, calc(100% - 40px)); min-height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); color: #8d7d6e; font-size: 10px; }
+
+@media (max-width: 820px) {
+  .topbar nav { display: none; }
+  .hero { grid-template-columns: 1fr; gap: 35px; min-height: 0; padding: 52px 0; }
+  .hero h1 { font-size: clamp(54px, 16vw, 80px); }
+  .offers, .steps { grid-template-columns: 1fr; }
+  .offer-card { min-height: 0; }
+  .dark-card blockquote { margin: 45px 0; }
+  .manifesto { grid-template-columns: 1fr; padding: 30px; }
+  footer { gap: 20px; align-items: flex-start; flex-direction: column; justify-content: center; padding: 22px 0; }
+}
+
+@media (max-width: 520px) {
+  .topbar, main, footer { width: min(100% - 28px, 1180px); }
+  .offer-card { padding: 26px 22px; }
+  .hero-card { padding: 22px; }
+  .manifesto h2 { font-size: 33px; }
+}
+
+/* Separate informational pages */
+.topbar nav a.active { color: var(--wine); }
+.content-page { padding-top: 54px; padding-bottom: 88px; }
+.back-link { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 52px; color: #77685b; font-size: 12px; font-weight: 800; text-decoration: none; }
+.back-link:hover { color: var(--wine); }
+.page-hero { max-width: 940px; padding-bottom: 66px; }
+.page-hero h1 { margin: 0; font-family: 'Libre Caslon Display', Georgia, serif; font-size: clamp(48px, 7vw, 86px); font-weight: 400; line-height: .96; letter-spacing: -.05em; }
+.page-hero h1 em { color: var(--wine); font-style: italic; }
+.page-hero > p:last-child { max-width: 760px; margin: 28px 0 0; color: #6e6054; font-size: 16px; line-height: 1.72; }
+.compact-page-hero { max-width: 850px; }
+.compact-page-hero h1 { font-size: clamp(46px, 6vw, 72px); }
+.page-steps { padding: 58px 0 72px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.content-card { margin-top: 28px; padding: 42px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.content-card h2, .legal-card h2 { margin: 0 0 12px; font-family: 'Libre Caslon Display', Georgia, serif; font-size: 31px; font-weight: 400; letter-spacing: -.03em; }
+.content-card > p:last-child { max-width: 800px; margin: 0; color: #75675b; font-size: 14px; line-height: 1.72; }
+.dark-content-card { color: #f9efe7; border-color: #3c2423; background: #2c1b1a; }
+.dark-content-card .eyebrow { color: #c8a06a; }
+.dark-content-card > p:last-child { color: #c2aca3; }
+.legal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.legal-card { min-height: 190px; padding: 30px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+.legal-card p { margin: 0; color: #75675b; font-size: 13px; line-height: 1.7; }
+.footer-links { display: flex; gap: 14px; }
+.footer-links a { color: inherit; text-decoration: none; }
+.footer-links a:hover { color: var(--wine); }
+
+@media (max-width: 820px) {
+  .topbar { gap: 18px; }
+  .topbar nav { display: flex; gap: 14px; }
+  .topbar nav a { font-size: 11px; }
+  .brand > span:last-child { display: none; }
+  .legal-grid { grid-template-columns: 1fr; }
+  .content-page { padding-top: 38px; }
+  .back-link { margin-bottom: 38px; }
+  .content-card { padding: 30px; }
+  footer { gap: 14px; }
+}
+
+/* Homepage purchase-first hierarchy */
+.offers-first { padding-top: 54px; }
+.middle-hero { border-top: 1px solid var(--line); }
+
+@media (max-width: 820px) {
+  .offers-first { padding-top: 38px; }
+}

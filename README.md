@@ -1,75 +1,49 @@
-# React + TypeScript + Vite
+# Chips for Jesus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite + React + TypeScript site with Stripe Checkout and Vercel serverless functions.
 
-Currently, two official plugins are available:
+## Local setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Copy `.env.example` to `.env.local`.
+2. Add your Stripe live secret key.
+3. For local API testing, use Vercel's local runtime:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```powershell
+npm install
+npx vercel dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Then open `http://localhost:3000`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Running only `npm run dev` starts Vite, but `/api/*` functions will not be available unless you separately proxy them. For this project, `npx vercel dev` is the simplest local workflow.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Stripe products already created
 
-```
+- Prayer Chip: `price_1ULX5xAX0lI7Mdm6Z47wVYSP`
+- Pray for Ivan: `price_1ULX62AX0lI7Mdm63IOotnaM`
+
+These are live prices in the connected OneTime Labs Stripe account.
+
+## Vercel environment variables
+
+Add these in Vercel Project Settings > Environment Variables:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_PRICE_PRAYER_CHIP`
+- `STRIPE_PRICE_PRAY_FOR_IVAN`
+- `SITE_URL`
+- `STRIPE_WEBHOOK_SECRET`
+
+Never create a variable named `VITE_STRIPE_SECRET_KEY`. Any `VITE_` variable is exposed to the browser.
+
+## Webhook
+
+After deploying, create a Stripe webhook endpoint for:
+
+`https://chipsforjesus.com/api/stripe-webhook`
+
+Subscribe to:
+
+`checkout.session.completed`
+
+Copy the signing secret (`whsec_...`) into `STRIPE_WEBHOOK_SECRET` locally and in Vercel.
