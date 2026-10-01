@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getSupabaseAdmin, requireJesusAdmin } from '../_lib/supabase.js'
+import { getErrorMessage, getSupabaseAdmin, requireJesusAdmin } from '../_lib/supabase.js'
 
 type OrderRow = {
   kind: 'chip' | 'pray'
@@ -70,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error('Jesus Admin list error:', error)
     return res.status(500).json({
-      error: error instanceof Error ? error.message : 'Could not load Jesus Admin data.',
+      error: getErrorMessage(error, 'Could not load Jesus Admin data.'),
     })
   }
 }

@@ -159,9 +159,9 @@ function HomePage() {
         <article className="offer-card dark-card">
           <div className="offer-icon"><HeartHandshake size={24} /></div>
           <p className="eyebrow">OPTION TWO</p>
-          <h2>Prayer for Me</h2>
+          <h2>Pray for Me</h2>
           <p className="offer-copy">
-            Think I need more help than you do? Fair. Put the prayer back on me.
+            Think I need more help than you do? Fair. Spend a dollar and put the prayer back on me.
           </p>
 
           <blockquote>

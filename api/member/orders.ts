@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getSupabaseAdmin, requireMember } from '../_lib/supabase.js'
+import { getErrorMessage, getSupabaseAdmin, requireMember } from '../_lib/supabase.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -62,7 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error('Member orders error:', error)
     return res.status(500).json({
-      error: error instanceof Error ? error.message : 'Could not load your Chips for Jesus account.',
+      error: getErrorMessage(error, 'Could not load your Chips for Jesus account.'),
     })
   }
 }

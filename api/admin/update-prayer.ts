@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getSupabaseAdmin, requireJesusAdmin } from '../_lib/supabase.js'
+import { getErrorMessage, getSupabaseAdmin, requireJesusAdmin } from '../_lib/supabase.js'
 
 type Action = 'increment' | 'complete' | 'reopen' | 'archive' | 'restore' | 'notes'
 
@@ -77,7 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error('Jesus Admin update error:', error)
     return res.status(500).json({
-      error: error instanceof Error ? error.message : 'Could not update prayer.',
+      error: getErrorMessage(error, 'Could not update prayer.'),
     })
   }
 }

@@ -113,3 +113,20 @@ export async function requireJesusAdmin(req: VercelRequest) {
 
   return auth
 }
+
+export function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message
+
+  if (error && typeof error === 'object') {
+    const value = error as Record<string, unknown>
+    const message = typeof value.message === 'string' ? value.message.trim() : ''
+    const details = typeof value.details === 'string' ? value.details.trim() : ''
+    const hint = typeof value.hint === 'string' ? value.hint.trim() : ''
+    const code = typeof value.code === 'string' ? value.code.trim() : ''
+
+    const parts = [message, details, hint, code ? `Code: ${code}` : ''].filter(Boolean)
+    if (parts.length) return parts.join(' | ')
+  }
+
+  return fallback
+}
