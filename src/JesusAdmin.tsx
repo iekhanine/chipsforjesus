@@ -16,12 +16,14 @@ import {
   RotateCcw,
   Search,
   Users,
+  BookOpen,
 } from 'lucide-react'
 import { supabase } from './lib/supabase'
 
 type OrderStatus = 'pending' | 'in_progress' | 'completed' | 'archived'
 type OrderKind = 'chip' | 'pray'
-type AdminView = 'overview' | 'orders' | 'give'
+type AdminView = 'overview' | 'orders' | 'give' | 'wall'
+type WallEntry = { id: number; prayer: string; response: string; category: string; visible: boolean }
 
 type PrayerOrder = {
   id: string
@@ -34,6 +36,9 @@ type PrayerOrder = {
   amount_total: number
   currency: string
   prayer_request: string | null
+  public_requested: boolean | null
+  public_approved: boolean | null
+  public_response: string | null
   payment_status: string | null
   fulfilled_quantity: number
   status: OrderStatus
@@ -107,9 +112,14 @@ export default function JesusAdmin() {
   const [query, setQuery] = useState('')
   const [kindFilter, setKindFilter] = useState<'all' | OrderKind>('all')
   const [statusFilter, setStatusFilter] = useState<'active' | 'all' | OrderStatus>('active')
+  const [publicReplies, setPublicReplies] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState<Record<string, string>>({})
   const [workingId, setWorkingId] = useState('')
   const [view, setView] = useState<AdminView>('overview')
+  const [wallEntries, setWallEntries] = useState<WallEntry[]>([])
+  const [wallBusy, setWallBusy] = useState(false)
+  const [wallMessage, setWallMessage] = useState('')
+  const [newWall, setNewWall] = useState({prayer:'',response:'',category:'Community'})
   const [grantEmail, setGrantEmail] = useState('')
   const [grantName, setGrantName] = useState('')
   const [grantQuantity, setGrantQuantity] = useState('')
@@ -130,7 +140,7 @@ export default function JesusAdmin() {
   }, [])
 
   useEffect(() => {
-    if (session?.access_token) loadOrders(session.access_token)
+    if (session?.access_token) { loadOrders(session.access_token); loadWall(session.access_token) }
   }, [session?.access_token])
 
   async function signInWithGoogle() {
@@ -197,7 +207,7 @@ export default function JesusAdmin() {
     }
   }
 
-  async function updateOrder(id: string, action: string, extra?: { notes?: string }) {
+  async function updateOrder(id: string, action: string, extra?: { notes?: string; publicResponse?: string }) {
     if (!session?.access_token) return
     setWorkingId(id)
     setError('')
@@ -221,6 +231,30 @@ export default function JesusAdmin() {
     } finally {
       setWorkingId('')
     }
+  }
+
+  async function loadWall(token = session?.access_token) {
+    if (!token) return
+    try {
+      const r = await fetch('/api/admin/wall-prayers', {headers:{Authorization:`Bearer ${token}`}})
+      const data = await readJson(r)
+      if (!r.ok) throw new Error(data.error || 'Could not load wall.')
+      setWallEntries(data.entries || [])
+    } catch (e) {setError(e instanceof Error ? e.message : 'Could not load wall.')}
+  }
+  async function saveWall(method: 'POST' | 'PATCH' | 'DELETE', entry: Partial<WallEntry>) {
+    if (!session?.access_token) return
+    if (method === 'DELETE' && !window.confirm('Delete this wall entry permanently?')) return
+    setWallBusy(true); setWallMessage(''); setError('')
+    try {
+      const r = await fetch('/api/admin/wall-prayers',{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(entry)})
+      const data = await readJson(r)
+      if(!r.ok) throw new Error(data.error || 'Unable to save entry')
+      if(method === 'POST') setNewWall({prayer:'',response:'',category:'Community'})
+      await loadWall(session.access_token)
+      setWallMessage(method === 'DELETE' ? 'Prayer removed.' : 'Prayer wall updated.')
+    } catch(e) {setError(e instanceof Error ? e.message : 'Unable to save entry')}
+    finally {setWallBusy(false)}
   }
 
   async function giveChips(event: FormEvent<HTMLFormElement>) {
@@ -378,6 +412,10 @@ export default function JesusAdmin() {
           <Gift size={20} />
           <span><strong>Give Chips</strong><small>Credit chips to any email</small></span>
         </button>
+        <button className={view === 'wall' ? 'is-active' : ''} onClick={() => {setView('wall');loadWall()}}>
+          <BookOpen size={20} />
+          <span><strong>Prayer Wall</strong><small>Edit, hide, add or delete wall entries</small></span>
+        </button>
       </nav>
 
       {error && <div className="error-box admin-error">{error}</div>}
@@ -418,7 +456,7 @@ export default function JesusAdmin() {
                 <div className="admin-activity-list">
                   {recentOrders.map((order) => (
                     <button key={order.id} onClick={() => { setQuery(order.customer_email || order.stripe_session_id); setView('orders') }}>
-                      <span className={`admin-kind ${order.kind}`}>{order.payment_status === 'admin_grant' ? 'Admin grant' : order.kind === 'chip' ? 'Prayer chip' : 'Pray for Ivan'}</span>
+                      <span className={`admin-kind ${order.kind}`}>{order.payment_status === 'admin_grant' ? 'Admin grant' : order.kind === 'chip' ? 'Prayer chip' : 'Prayer for Me'}</span>
                       <strong>{order.customer_name || order.customer_email || 'Customer'}</strong>
                       <small>{count(order.quantity)} {order.kind === 'chip' ? 'chips' : 'prayers'} · {when(order.stripe_created_at || order.created_at)}</small>
                     </button>
@@ -436,6 +474,19 @@ export default function JesusAdmin() {
           </div>
         </section>
       )}
+
+      {view === 'wall' && <section className="admin-view wall-admin" aria-labelledby="wall-admin-title">
+        <div className="admin-view-heading"><div><p className="eyebrow">WALL MODERATION</p><h2 id="wall-admin-title">The Prayer Wall</h2><p>Edit, publish, hide or delete the 20 starter prayers and any new wall entries here. Customer submissions are moderated separately in Prayer Queue.</p></div><button className="admin-section-jump" onClick={() => loadWall()}>Refresh wall</button></div>
+        {wallMessage && <p className="notice success" role="status">{wallMessage}</p>}
+        <div className="wall-admin-new admin-panel"><h3>Add a prayer</h3><label>Category<input value={newWall.category} maxLength={80} onChange={e=>setNewWall(v=>({...v,category:e.target.value}))}/></label><label>Prayer<textarea maxLength={2000} value={newWall.prayer} onChange={e=>setNewWall(v=>({...v,prayer:e.target.value}))}/></label><label>Your response<textarea maxLength={2000} value={newWall.response} onChange={e=>setNewWall(v=>({...v,response:e.target.value}))}/></label><button disabled={wallBusy || !newWall.prayer.trim() || !newWall.response.trim()} onClick={()=>saveWall('POST',{...newWall,visible:true})}>Add to wall</button></div>
+        <div className="wall-admin-list">{wallEntries.map(entry=><article className="admin-panel wall-admin-entry" key={entry.id}>
+          <div className="wall-admin-top"><strong>Prayer #{entry.id}</strong><span>{entry.visible ? 'Visible' : 'Hidden'}</span></div>
+          <label>Category<input maxLength={80} value={entry.category} onChange={e=>setWallEntries(old=>old.map(item=>item.id===entry.id?{...item,category:e.target.value}:item))}/></label>
+          <label>Prayer<textarea maxLength={2000} value={entry.prayer} onChange={e=>setWallEntries(old=>old.map(item=>item.id===entry.id?{...item,prayer:e.target.value}:item))}/></label>
+          <label>Your response<textarea maxLength={2000} value={entry.response} onChange={e=>setWallEntries(old=>old.map(item=>item.id===entry.id?{...item,response:e.target.value}:item))}/></label>
+          <div className="wall-admin-actions"><button disabled={wallBusy} onClick={()=>saveWall('PATCH',entry)}>Save changes</button><button disabled={wallBusy} onClick={()=>saveWall('PATCH',{...entry,visible:!entry.visible})}>{entry.visible?'Hide from wall':'Show on wall'}</button><button className="wall-delete" disabled={wallBusy} onClick={()=>saveWall('DELETE',{id:entry.id})}>Delete</button></div>
+        </article>)}</div>
+      </section>}
 
       {view === 'orders' && (
         <section className="admin-view" aria-labelledby="admin-orders-title">
@@ -455,7 +506,7 @@ export default function JesusAdmin() {
             <select value={kindFilter} onChange={(event) => setKindFilter(event.target.value as typeof kindFilter)}>
               <option value="all">All types</option>
               <option value="chip">Prayer chips</option>
-              <option value="pray">Pray for Ivan</option>
+              <option value="pray">Prayer for Me</option>
             </select>
             <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)}>
               <option value="active">Active</option>
@@ -477,7 +528,7 @@ export default function JesusAdmin() {
                 <article className={`admin-order ${order.status === 'archived' ? 'is-archived' : ''}`} key={order.id}>
                   <div className="admin-order-top">
                     <div>
-                      <span className={`admin-kind ${order.kind}`}>{order.payment_status === 'admin_grant' ? 'Admin grant' : order.kind === 'chip' ? 'Prayer chip' : 'Pray for Ivan'}</span>
+                      <span className={`admin-kind ${order.kind}`}>{order.payment_status === 'admin_grant' ? 'Admin grant' : order.kind === 'chip' ? 'Prayer chip' : 'Prayer for Me'}</span>
                       <h2>{order.customer_name || 'Customer'}</h2>
                       {order.customer_email && <a href={`mailto:${order.customer_email}`}>{order.customer_email}</a>}
                     </div>
@@ -504,10 +555,16 @@ export default function JesusAdmin() {
                   {order.kind === 'pray' && (
                     <div className="admin-prayer-text ivan-prayer">
                       <span>Prayer direction</span>
-                      <p>This customer purchased {order.quantity === 1 ? 'a prayer' : `${count(order.quantity)} prayers`} for Ivan.</p>
+                      <p>{order.prayer_request || 'No written prayer included.'}</p>
                     </div>
                   )}
 
+                  {order.public_requested && order.prayer_request && <div className="admin-public-control">
+                    <strong>Public prayer wall · {order.public_approved ? 'Published' : 'Awaiting approval'}</strong>
+                    <p>The customer opted in. Review their text for personal details before publishing; only the prayer and your public reply will appear.</p>
+                    <textarea aria-label="Public response" value={publicReplies[order.id] ?? order.public_response ?? ''} onChange={e => setPublicReplies(old => ({ ...old, [order.id]: e.target.value }))} placeholder="Your public reply to this prayer..." maxLength={1000}/>
+                    <div className="admin-public-actions"><button disabled={workingId === order.id} onClick={() => updateOrder(order.id, 'publish', { publicResponse: publicReplies[order.id] ?? order.public_response ?? '' })}>Publish prayer &amp; reply</button><button disabled={workingId === order.id} onClick={() => updateOrder(order.id, 'unpublish')}>Unpublish</button></div>
+                  </div>}
                   <div className="admin-notes">
                     <label htmlFor={`notes-${order.id}`}>Private admin notes</label>
                     <textarea

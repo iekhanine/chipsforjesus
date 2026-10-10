@@ -28,7 +28,7 @@ export default async function handler(
   const stripe = new Stripe(secretKey)
 
   try {
-    const { kind, quantity = 1, prayerRequest = '' } = req.body ?? {}
+    const { kind, quantity = 1, prayerRequest = '', publicRequested = false } = req.body ?? {}
 
     if (kind !== 'chip' && kind !== 'pray') {
       return res.status(400).json({ error: 'Invalid purchase type.' })
@@ -56,7 +56,8 @@ export default async function handler(
       project: 'chipsforjesus',
       kind,
       quantity: String(qty),
-      prayer_request: kind === 'chip' ? cleanPrayerRequest : '',
+      prayer_request: cleanPrayerRequest,
+      public_requested: publicRequested === true && !!cleanPrayerRequest ? 'true' : 'false',
     }
     if (memberUserId) metadata.member_user_id = memberUserId
 

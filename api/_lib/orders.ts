@@ -33,6 +33,7 @@ export async function persistCheckoutSession(
     amount_total: session.amount_total || 0,
     currency: session.currency || 'usd',
     prayer_request: metadata.prayer_request?.trim() || null,
+    public_requested: metadata.public_requested === 'true',
     payment_status: session.payment_status || null,
     stripe_created_at: new Date(session.created * 1000).toISOString(),
     updated_at: new Date().toISOString(),

@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/prayers", "destination": "/index.html" },
     { "source": "/how-it-works", "destination": "/index.html" },
     { "source": "/fine-print", "destination": "/index.html" },
     { "source": "/jesus-admin", "destination": "/index.html" },

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getErrorMessage, getSupabaseAdmin, requireJesusAdmin } from '../_lib/supabase.js'
 
-type Action = 'increment' | 'complete' | 'reopen' | 'archive' | 'restore' | 'notes'
+type Action = 'increment' | 'complete' | 'reopen' | 'archive' | 'restore' | 'notes' | 'publish' | 'unpublish'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -13,11 +13,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const auth = await requireJesusAdmin(req)
     if (!auth.ok) return res.status(auth.status).json({ error: auth.error })
 
-    const body = (req.body ?? {}) as { id?: string; action?: Action; notes?: string }
-    const { id, action, notes } = body
+    const body = (req.body ?? {}) as { id?: string; action?: Action; notes?: string; publicResponse?: string }
+    const { id, action, notes, publicResponse } = body
     if (!id || !action) return res.status(400).json({ error: 'Order id and action are required.' })
 
-    const allowedActions: Action[] = ['increment', 'complete', 'reopen', 'archive', 'restore', 'notes']
+    const allowedActions: Action[] = ['increment', 'complete', 'reopen', 'archive', 'restore', 'notes', 'publish', 'unpublish']
     if (!allowedActions.includes(action)) return res.status(400).json({ error: 'Invalid admin action.' })
 
     const supabase = getSupabaseAdmin()
@@ -60,6 +60,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (action === 'restore') {
       patch.status = fulfilled >= quantity ? 'completed' : fulfilled > 0 ? 'in_progress' : 'pending'
     }
+
+    if (action === 'publish') {
+      if (!current.public_requested || !current.prayer_request) return res.status(400).json({ error: 'Customer did not opt in to sharing a written prayer.' })
+      if (!publicResponse?.trim()) return res.status(400).json({ error: 'Write a public response before publishing.' })
+      patch.public_approved = true
+      patch.public_response = publicResponse.trim().slice(0, 1000)
+    }
+    if (action === 'unpublish') patch.public_approved = false
 
     if (action === 'notes') {
       patch.admin_notes = typeof notes === 'string' ? notes.slice(0, 4000) : ''

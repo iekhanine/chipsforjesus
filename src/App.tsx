@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import JesusAdmin from './JesusAdmin'
 import Members from './Members'
 import { CreateAccountPage, ForgotPasswordPage, LoginPage, ResetPasswordPage } from './AuthPages'
@@ -7,22 +7,21 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Church,
   HeartHandshake,
   Minus,
   Plus,
-  ShieldCheck,
   Sparkles,
 } from 'lucide-react'
 
 type PurchaseKind = 'chip' | 'pray'
 
-type Page = 'home' | 'how' | 'fine-print' | 'admin' | 'login' | 'create-account' | 'members' | 'forgot-password' | 'reset-password'
+type Page = 'home' | 'prayers' | 'how' | 'fine-print' | 'admin' | 'login' | 'create-account' | 'members' | 'forgot-password' | 'reset-password'
 
 const clamp = (value: number) => Math.max(1, Math.min(50, value))
 
 function currentPage(): Page {
   const path = window.location.pathname.replace(/\/+$/, '') || '/'
+  if (path === '/prayers') return 'prayers'
   if (path === '/how-it-works') return 'how'
   if (path === '/fine-print') return 'fine-print'
   if (path === '/jesus-admin') return 'admin'
@@ -42,6 +41,7 @@ export default function App() {
       <Header page={page} />
       {page === 'how' ? <HowItWorksPage />
         : page === 'fine-print' ? <FinePrintPage />
+        : page === 'prayers' ? <PrayersPage />
         : page === 'admin' ? <JesusAdmin />
         : page === 'login' ? <LoginPage />
         : page === 'create-account' ? <CreateAccountPage />
@@ -49,7 +49,7 @@ export default function App() {
         : page === 'forgot-password' ? <ForgotPasswordPage />
         : page === 'reset-password' ? <ResetPasswordPage />
         : <HomePage />}
-      <Footer />
+      {page !== 'home' && <Footer />}
     </div>
   )
 }
@@ -66,6 +66,7 @@ function Header({ page }: { page: Page }) {
           <a href="/">Back to site</a>
         ) : (
           <>
+            <a className={page === 'prayers' ? 'active' : ''} href="/prayers">Prayer wall</a>
             <a className={page === 'how' ? 'active' : ''} href="/how-it-works">How it works</a>
             <a className={page === 'fine-print' ? 'active' : ''} href="/fine-print">Fine print</a>
             <a className={page === 'members' || page === 'login' ? 'active' : ''} href="/members">My chips</a>
@@ -80,6 +81,9 @@ function HomePage() {
   const [chipQty, setChipQty] = useState(1)
   const [prayQty, setPrayQty] = useState(1)
   const [prayerRequest, setPrayerRequest] = useState('')
+  const [ivanPrayer, setIvanPrayer] = useState('')
+  const [chipPublic, setChipPublic] = useState(false)
+  const [ivanPublic, setIvanPublic] = useState(false)
   const [loading, setLoading] = useState<PurchaseKind | null>(null)
   const [error, setError] = useState('')
 
@@ -103,7 +107,8 @@ function HomePage() {
         body: JSON.stringify({
           kind,
           quantity: kind === 'chip' ? chipQty : prayQty,
-          prayerRequest: kind === 'chip' ? prayerRequest : undefined,
+          prayerRequest: kind === 'chip' ? prayerRequest : ivanPrayer,
+          publicRequested: kind === 'chip' ? chipPublic : ivanPublic,
         }),
       })
 
@@ -129,32 +134,25 @@ function HomePage() {
         <div className="notice">Checkout cancelled. No theological paperwork was filed.</div>
       )}
 
-      <section className="cartoon-welcome" aria-label="Welcome to Chips for Jesus">
-        <div className="cartoon-welcome-copy">
-          <span className="welcome-sticker">✦ THE HOLIEST SNACK ON THE INTERNET ✦</span>
-          <h1>A little faith.<br /><span>A lot of crunch.</span></h1>
-          <p>One dollar. One prayer chip. A completely ridiculous website with a surprisingly sincere promise: if you ask for a prayer, you'll get one.</p>
-          <a className="welcome-cta" href="#prayer-options">GET YOUR $1 PRAYER <ArrowRight size={20} /></a>
-          <span className="welcome-aside">No casinos. No jackpots. Just Jesus, chips &amp; good intentions.</span>
-        </div>
-        <div className="cartoon-welcome-art">
-          <div className="art-rays" aria-hidden="true">✳</div>
-          <img src="/chips-for-jesus-logo.webp" alt="Cartoon Jesus smiling and offering a potato chip with the Chips for Jesus logo" />
-          <span className="art-sticker">100% GOOD VIBES*</span>
-        </div>
-      </section>
-      <div className="feast-ribbon" role="img" aria-label="Colorful cartoon banquet of potato chips, tortilla chips and crunchy snacks" />
-      <div className="section-heading" id="prayer-options"><span>THE MENU</span><h2>Pick your blessing.</h2><p>Every chip is just $1. Heavenly simplicity.</p></div>
+      <section className="wall-preview"><div className="section-heading"><span>PRAYERS FROM THE PEWS</span><h2>The prayer wall</h2></div><PrayerWall preview /><a className="welcome-cta" href="/prayers">READ ALL PRAYERS <ArrowRight size={19}/></a></section>
+
+      <div className="purchase-spotlight">
+        <div className="purchase-spotlight-top"><Sparkles size={18} /><span>TWO WAYS TO SPREAD THE GOOD WORD · ONE DOLLAR EACH</span><Sparkles size={18} /></div>
+      <div className="section-heading" id="prayer-options"><span>THE MAIN EVENT · JUST $1</span><h2>Who needs a prayer?</h2><p>Choose a side. Write something if you like. The prayer is real, even if the website is ridiculous.</p></div>
 
       <section className="offers offers-first" aria-label="Prayer options">
         <article className="offer-card featured">
+          <div className="offer-heading">
           <div className="offer-icon"><Sparkles size={24} /></div>
           <p className="eyebrow">OPTION ONE</p>
           <h2>Prayer for You</h2>
+          </div>
           <p className="offer-copy">
             You buy a chip. You can tell me what is going on, or leave it blank. I will take the request seriously and say a prayer for you.
           </p>
 
+          <div className="offer-layout">
+          <div className="offer-message">
           <label className="field-label" htmlFor="prayer-request">What should I pray about? <span>Optional</span></label>
           <textarea
             id="prayer-request"
@@ -165,67 +163,63 @@ function HomePage() {
           />
           <div className="field-meta">{prayerRequest.length}/450</div>
 
+          </div>
+          <div className="offer-actions">
+          <label className="wall-consent"><input type="checkbox" checked={chipPublic} onChange={e => setChipPublic(e.target.checked)} /> I would like this prayer considered for the public prayer wall. Only Ivan can approve it; no personal details will be displayed.</label>
           <QuantityControl value={chipQty} onChange={setChipQty} label="chips" />
           <button className="primary-button" disabled={loading !== null} onClick={() => checkout('chip')}>
             {loading === 'chip' ? 'Opening Stripe...' : `Buy ${chipQty} ${chipQty === 1 ? 'chip' : 'chips'} for $${chipQty}`}
             <ArrowRight size={17} />
           </button>
+          </div>
+          </div>
         </article>
 
         <article className="offer-card dark-card">
+          <div className="offer-heading">
           <div className="offer-icon"><HeartHandshake size={24} /></div>
           <p className="eyebrow">OPTION TWO</p>
-          <h2>Pray for Me</h2>
+          <h2>Prayer for Me</h2>
+          </div>
           <p className="offer-copy">
             Think I need more help than you do? Fair. Spend a dollar and put the prayer back on me.
           </p>
 
-          <blockquote>
-            “You pray for me. I’ll take all the help I can get.”
-          </blockquote>
 
+          <div className="offer-layout">
+          <div className="offer-message">
+          <label className="field-label" htmlFor="ivan-prayer">Your prayer for me <span>Optional</span></label>
+          <textarea id="ivan-prayer" maxLength={450} value={ivanPrayer} onChange={e => setIvanPrayer(e.target.value)} placeholder="Dear Lord, please help this man find the good chips..." />
+          <div className="field-meta">{ivanPrayer.length}/450</div>
+          </div>
+          <div className="offer-actions">
+          <label className="wall-consent wall-consent-dark"><input type="checkbox" checked={ivanPublic} onChange={e => setIvanPublic(e.target.checked)} /> Consider sharing my prayer on the public wall (after Ivan approves).</label>
           <QuantityControl value={prayQty} onChange={setPrayQty} label="prayers" dark />
           <button className="secondary-button" disabled={loading !== null} onClick={() => checkout('pray')}>
-            {loading === 'pray' ? 'Opening Stripe...' : `Pray for Me ${prayQty}× for $${prayQty}`}
+            {loading === 'pray' ? 'Opening Stripe...' : `Prayer for Me ${prayQty}× for $${prayQty}`}
             <ArrowRight size={17} />
           </button>
+          </div>
+          </div>
         </article>
       </section>
 
+      </div>
+      <section className="cartoon-welcome" aria-label="Welcome to Chips for Jesus">
+        <div className="cartoon-welcome-copy">
+          <span className="welcome-sticker">✦ THE HOLIEST SNACK ON THE INTERNET ✦</span>
+          <h1>A little faith.<br /><span>A lot of crunch.</span></h1>
+          <p>One dollar. One prayer chip. A ridiculous website with a sincere promise: if you ask for a prayer, you'll get one.</p>
+          <a className="welcome-cta" href="#prayer-options">SEE THE $1 PRAYER OPTIONS <ArrowRight size={20} /></a>
+          <span className="welcome-aside">No casinos. No jackpots. Just Jesus, chips &amp; good intentions.</span>
+        </div>
+        <div className="cartoon-welcome-art">
+          <div className="art-rays" aria-hidden="true">✳</div>
+          <img src="/chips-for-jesus-logo.webp" alt="Cartoon Jesus smiling and offering a potato chip with the Chips for Jesus logo" />
+          <span className="art-sticker">100% GOOD VIBES*</span>
+        </div>
+      </section>
       {error && <div className="error-box">{error}</div>}
-
-      <section className="hero middle-hero">
-        <div className="hero-copy">
-          <p className="eyebrow">A VERY SMALL RELIGIOUS TRANSACTION</p>
-          <h1>Buy a chip.<br /><em>Get a prayer.</em></h1>
-          <p className="lede">
-            One dollar buys one prayer chip. Tell me what you want me to pray about and I will genuinely take a moment to pray for you.
-          </p>
-          <div className="hero-note">
-            <ShieldCheck size={18} />
-            <span>Not a church. Not a charity. Just a very small internet transaction involving prayer.</span>
-          </div>
-        </div>
-
-        <div className="hero-card">
-          <span className="hero-card-label">CURRENT THEOLOGICAL STATUS</span>
-          <div className="status-row"><span>Prayer requests accepted</span><strong>YES</strong></div>
-          <div className="status-row"><span>Price per chip</span><strong>$1</strong></div>
-          <div className="status-row"><span>Official divine affiliation</span><strong>NONE</strong></div>
-          <p>Results may vary. Eternity remains outside our service-level agreement.</p>
-        </div>
-      </section>
-
-      <section className="manifesto">
-        <Church size={30} />
-        <div>
-          <p className="eyebrow">THE WEIRDLY SINCERE PART</p>
-          <h2>If you need a prayer, I will pray for you.</h2>
-          <p>
-            If something matters enough that you want another person to stop what they are doing and spend a minute thinking about you, I can do that. You do not need to prove anything, explain your beliefs, or make the request funny.
-          </p>
-        </div>
-      </section>
     </main>
   )
 }
@@ -258,7 +252,7 @@ function HowItWorksPage() {
 
       <section className="content-card dark-content-card">
         <p className="eyebrow">THE OTHER DIRECTION</p>
-        <h2>What does “Pray for Me” mean?</h2>
+        <h2>What does “Prayer for Me” mean?</h2>
         <p>
           It means exactly what it sounds like. You spend a dollar, and the prayer is yours to make for me. There is no claim that buying a prayer makes it stronger, faster, or more likely to receive divine technical support.
         </p>
@@ -282,7 +276,7 @@ function FinePrintPage() {
       <section className="legal-grid">
         <article className="legal-card">
           <h2>Who operates this?</h2>
-          <p>Chips for Jesus is an independent novelty project operated by Ivan.</p>
+          <p>Chips for Jesus is an independent novelty project operated by some dude named Ivan.</p>
         </article>
         <article className="legal-card">
           <h2>Is this a charity?</h2>
@@ -313,7 +307,7 @@ function Footer() {
   return (
     <footer>
       <span>© {new Date().getFullYear()} Chips for Jesus</span>
-      <span className="footer-links"><a href="/how-it-works">How it works</a><a href="/fine-print">Fine print</a><a href="/members">My chips</a></span>
+      <span className="footer-links"><a href="/how-it-works">How it works</a><a href="/fine-print">Fine print</a><a href="/prayers">Prayer wall</a><a href="/members">My chips</a></span>
       <span>Built with unreasonable confidence and Stripe.</span>
     </footer>
   )
@@ -335,3 +329,102 @@ function QuantityControl({ value, onChange, label, dark = false }: { value: numb
     </div>
   )
 }
+
+
+type WallPrayer = { id: string; prayer: string; response: string; category: string; sample?: boolean }
+
+function PrayerWall({ preview = false }: { preview?: boolean }) {
+  const [real, setReal] = useState<WallPrayer[]>([])
+  useEffect(() => {
+    let active = true
+    async function loadPrayers() {
+      // Vercel serves /api/* in production. Plain `vite` on localhost does not.
+      // If it is unavailable, use the PUBLIC wall entries only via Supabase RLS.
+      try {
+        const response = await fetch('/api/public-prayers')
+        if (!response.ok) throw new Error('Prayer API unavailable')
+        const data = await response.json()
+        if (Array.isArray(data.prayers) && data.prayers.length > 0) {
+          if (active) setReal(data.prayers)
+          return
+        }
+      } catch {
+        // Local Vite or server API outage: try the public read-only table.
+      }
+      if (!supabase) return
+      const { data, error } = await supabase
+        .from('c4j_wall_entries')
+        .select('id,prayer,response,category')
+        .eq('visible', true)
+        .order('id', { ascending: true })
+        .limit(100)
+      if (error) {
+        console.warn('Unable to load public prayer wall:', error.message)
+        return
+      }
+      if (active) setReal((data || []).map(item => ({
+        id: `seed-${item.id}`,
+        prayer: item.prayer,
+        response: item.response,
+        category: item.category || 'Community',
+      })))
+    }
+    void loadPrayers()
+    return () => { active = false }
+  }, [])
+  const all = real.filter(item => item && typeof item.prayer === 'string' && typeof item.response === 'string')
+  if (all.length === 0) return <div className="prayer-wall-empty" role="status">The prayer wall is awaiting its first published prayer.</div>
+  return preview ? <FadingPrayerPreview prayers={all} /> : <div className="prayer-grid" aria-label="Public prayer messages">
+    {all.map(item => <PrayerCard key={item.id} item={item} />)}
+  </div>
+}
+function PrayerCard({ item }: { item: WallPrayer | undefined }) {
+  if (!item) return null
+  return <article className="wall-card">
+    <span className="wall-tag">{item.category}</span>
+    <p className="wall-prayer">“{item.prayer}”</p>
+    <div className="wall-reply"><strong>Ivan replies</strong><p>{item.response}</p></div>
+  </article>
+}
+function FadingPrayerPreview({ prayers }: { prayers: WallPrayer[] }) {
+  const [slots, setSlots] = useState([0, 1, 2])
+  const [fadingSlot, setFadingSlot] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (prayers.length <= 3 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    // Change one of the three cards each tick. Do NOT pause on hover:
+    // the visitor's cursor may be sitting on the wall all the time.
+    let slotToChange = 0
+    let nextPrayer = 3
+    let fadeTimeout: ReturnType<typeof setTimeout> | undefined
+    const interval = window.setInterval(() => {
+      const targetSlot = slotToChange
+      slotToChange = (slotToChange + 1) % 3
+      setFadingSlot(targetSlot)
+      fadeTimeout = window.setTimeout(() => {
+        setSlots(previous => previous.map((index, position) =>
+          position === targetSlot ? (nextPrayer++ % prayers.length) : index
+        ))
+        setFadingSlot(null)
+      }, 450)
+    }, 3200)
+
+    return () => {
+      window.clearInterval(interval)
+      if (fadeTimeout) window.clearTimeout(fadeTimeout)
+    }
+  }, [prayers.length])
+
+  if (!prayers.length) return null
+  return <div className="prayer-fade-grid" aria-label="Public prayer messages">
+    {slots.slice(0, Math.min(3, prayers.length)).map((index, slot) => <div key={slot} className={`prayer-fade-slot ${fadingSlot === slot ? 'is-fading' : ''}`}>
+      <PrayerCard item={prayers[index % prayers.length]} />
+    </div>)}
+  </div>
+}
+function PrayersPage() {
+  return <main className="content-page prayers-page"><a className="back-link" href="/"><ArrowLeft size={15}/> Back to the chips</a><section className="page-hero"><p className="eyebrow">THE WALL OF PRAYERS</p><h1>Heaven has a comment section.</h1><p>Real prayers appear only with the submitter's permission and after Ivan approves them.</p></section><PrayerWall/><a className="welcome-cta" href="/#prayer-options">ADD YOUR PRAYER <ArrowRight size={18}/></a></main>
+}
+
+
