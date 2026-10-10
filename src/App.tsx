@@ -397,7 +397,7 @@ function FadingPrayerPreview({ prayers }: { prayers: WallPrayer[] }) {
     // the visitor's cursor may be sitting on the wall all the time.
     let slotToChange = 0
     let nextPrayer = 3
-    let fadeTimeout: ReturnType<typeof setTimeout> | undefined
+    let fadeTimeout: number | undefined
     const interval = window.setInterval(() => {
       const targetSlot = slotToChange
       slotToChange = (slotToChange + 1) % 3
