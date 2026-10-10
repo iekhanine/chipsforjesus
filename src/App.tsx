@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Check,
   Church,
-  Coins,
   HeartHandshake,
   Minus,
   Plus,
@@ -59,7 +58,7 @@ function Header({ page }: { page: Page }) {
   return (
     <header className="topbar">
       <a className="brand" href="/" aria-label="Chips for Jesus home">
-        <span className="brand-mark"><Coins size={21} /></span>
+        <span className="brand-mark"><img src="/chips-for-jesus-logo.webp" alt="" /></span>
         <span>Chips for Jesus</span>
       </a>
       <nav aria-label="Primary navigation">
@@ -129,6 +128,23 @@ function HomePage() {
       {status === 'cancelled' && (
         <div className="notice">Checkout cancelled. No theological paperwork was filed.</div>
       )}
+
+      <section className="cartoon-welcome" aria-label="Welcome to Chips for Jesus">
+        <div className="cartoon-welcome-copy">
+          <span className="welcome-sticker">✦ THE HOLIEST SNACK ON THE INTERNET ✦</span>
+          <h1>A little faith.<br /><span>A lot of crunch.</span></h1>
+          <p>One dollar. One prayer chip. A completely ridiculous website with a surprisingly sincere promise: if you ask for a prayer, you'll get one.</p>
+          <a className="welcome-cta" href="#prayer-options">GET YOUR $1 PRAYER <ArrowRight size={20} /></a>
+          <span className="welcome-aside">No casinos. No jackpots. Just Jesus, chips &amp; good intentions.</span>
+        </div>
+        <div className="cartoon-welcome-art">
+          <div className="art-rays" aria-hidden="true">✳</div>
+          <img src="/chips-for-jesus-logo.webp" alt="Cartoon Jesus smiling and offering a potato chip with the Chips for Jesus logo" />
+          <span className="art-sticker">100% GOOD VIBES*</span>
+        </div>
+      </section>
+      <div className="feast-ribbon" role="img" aria-label="Colorful cartoon banquet of potato chips, tortilla chips and crunchy snacks" />
+      <div className="section-heading" id="prayer-options"><span>THE MENU</span><h2>Pick your blessing.</h2><p>Every chip is just $1. Heavenly simplicity.</p></div>
 
       <section className="offers offers-first" aria-label="Prayer options">
         <article className="offer-card featured">
@@ -234,7 +250,7 @@ function HowItWorksPage() {
 
       <section className="content-card">
         <p className="eyebrow">WHAT A CHIP IS</p>
-        <h2>It is not a physical poker chip in the mail.</h2>
+        <h2>It is a digital prayer chip, not a physical item in the mail.</h2>
         <p>
           A Prayer Chip is a $1 novelty service. Buying one represents one prayer request. You can leave the request blank, write something serious, or keep it light. Nothing needs to be public.
         </p>
